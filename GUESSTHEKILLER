@@ -1,0 +1,97 @@
+import random
+
+SUSPECTS = ["Colonel Mustard", "Miss Scarlett", "Professor Plum", "Mrs. White", "Dr. Green"]
+ROOMS = ["Library", "Kitchen", "Study", "Garden", "Ballroom"]
+WEAPONS = ["Candlestick", "Rope", "Knife", "Poison", "Wrench"]
+
+
+def setup():
+    killer = random.choice(SUSPECTS)
+    murder_room = random.choice(ROOMS)
+    weapon = random.choice(WEAPONS)
+    other_rooms = [r for r in ROOMS if r != murder_room]
+
+    # The killer is alone in the murder room; everyone else is elsewhere.
+    location = {killer: murder_room}
+    for s in SUSPECTS:
+        if s != killer:
+            location[s] = random.choice(other_rooms)
+
+    # The killer lies, claiming to be in a room where an innocent really was.
+    innocent_rooms = [location[s] for s in SUSPECTS if s != killer]
+    claimed_room = random.choice(innocent_rooms)
+    return killer, murder_room, weapon, location, claimed_room
+
+
+def interrogate(suspect, killer, location, claimed_room):
+    if suspect == killer:
+        room = claimed_room
+        company = []  # the killer claims to have been alone
+    else:
+        room = location[suspect]
+        company = [s for s in SUSPECTS if s != suspect and location[s] == room]
+    if company:
+        print(f'{suspect}: "I was in the {room} with {", ".join(company)}."')
+    else:
+        print(f'{suspect}: "I was in the {room}. All alone, I\'m afraid."')
+
+
+def main():
+    killer, murder_room, weapon, location, claimed_room = setup()
+    print("=== MURDER AT BLACKWOOD MANOR ===")
+    print("Lord Blackwood has been found dead. The killer is among the guests.")
+    print("Hint: someone's alibi won't match what the others say.\n")
+
+    clues_left = 3
+    while True:
+        print("\nWhat do you do?")
+        print("1. Interrogate a suspect")
+        print("2. Search a room (%d searches left)" % clues_left)
+        print("3. Make an accusation")
+        choice = input("> ").strip()
+
+        if choice == "1":
+            for i, s in enumerate(SUSPECTS, 1):
+                print(f"  {i}. {s}")
+            pick = input("Who? ").strip()
+            if pick.isdigit() and 1 <= int(pick) <= len(SUSPECTS):
+                interrogate(SUSPECTS[int(pick) - 1], killer, location, claimed_room)
+            else:
+                print("Invalid choice.")
+
+        elif choice == "2":
+            if clues_left == 0:
+                print("You're out of searches.")
+                continue
+            for i, r in enumerate(ROOMS, 1):
+                print(f"  {i}. {r}")
+            pick = input("Which room? ").strip()
+            if pick.isdigit() and 1 <= int(pick) <= len(ROOMS):
+                clues_left -= 1
+                room = ROOMS[int(pick) - 1]
+                if room == murder_room:
+                    print(f"In the {room}, you find a body and a bloody {weapon.lower()}!")
+                else:
+                    print(f"You search the {room} and find nothing unusual.")
+            else:
+                print("Invalid choice.")
+
+        elif choice == "3":
+            for i, s in enumerate(SUSPECTS, 1):
+                print(f"  {i}. {s}")
+            pick = input("Who is the killer? ").strip()
+            if pick.isdigit() and 1 <= int(pick) <= len(SUSPECTS):
+                accused = SUSPECTS[int(pick) - 1]
+                if accused == killer:
+                    print(f"\nCorrect! {killer} did it in the {murder_room} with the {weapon.lower()}. Case closed!")
+                else:
+                    print(f"\nWrong! {accused} is innocent. The real killer, {killer}, escapes...")
+                break
+            else:
+                print("Invalid choice.")
+        else:
+            print("Please enter 1, 2, or 3.")
+
+
+if __name__ == "__main__":
+    main()

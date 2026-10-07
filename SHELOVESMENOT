@@ -1,0 +1,52 @@
+import random
+import time
+
+CALENDULA_CHAMOMILE = r"""
+      .-.
+   .-(   )-.
+  (   (o)   )
+   `-(   )-'
+      `-'
+       |
+      \|/
+       |
+"""
+
+
+def pluck_petals(petals: int) -> bool:
+    for i in range(1, petals + 1):
+        loves = i % 2 == 1  # 1st petal = loves me, 2nd = loves me not, ...
+        remaining = petals - i
+        message = "💖 Loves me..." if loves else "💔 Loves me not..."
+        print(f"  Petal {i:>2}: {message}  ({remaining} left)")
+        time.sleep(0.7)
+    return petals % 2 == 1
+
+
+def play() -> None:
+    print(CALENDULA_CHAMOMILE)
+    name = input("Who are you wondering about?(Name): ").strip() or "Your crush"
+    petals = random.randint(3, 11)
+    print(f"\nYour Calendula/Chamomile has {petals} petals. Let's find out about {name}!\n")
+    input("Press Enter to start plucking... ")
+    print()
+
+    if pluck_petals(petals):
+        print(f"\n✨ {name} LOVES you! Go tell them! ✨")
+    else:
+        print(f"\n🌧️  {name} loves you not... but there are plenty more daisies!")
+
+
+def main() -> None:
+    print("🌼 LOVES ME, LOVES ME NOT 🌼")
+    while True:
+        play()
+        again = input("\nPick another flower? (y/n): ").strip().lower()
+        if again != "y":
+            print("\nThanks for playing! 🌸")
+            break
+        print("\n" + "-" * 40)
+
+
+if __name__ == "__main__":
+    main()
